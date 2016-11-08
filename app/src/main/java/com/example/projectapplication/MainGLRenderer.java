@@ -3,13 +3,17 @@ package com.example.projectapplication;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.example.projectapplication.SpriteObjects.Triangle;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
  * Created by Lionel on 11/4/2016.
  */
-public class MainGLRenderer implements GLSurfaceView.Renderer {
+public class MainGLRenderer implements GLSurfaceView.Renderer
+{
+    private final Triangle triangle = new Triangle();
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
@@ -21,6 +25,7 @@ public class MainGLRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 ununused)
     {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        this.triangle.draw();
     }
 
     @Override

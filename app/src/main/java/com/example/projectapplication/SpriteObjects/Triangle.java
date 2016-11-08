@@ -11,9 +11,18 @@ import java.nio.FloatBuffer;
 /**
  * Created by Lionel on 11/4/2016.
  */
-public class Triangle {
+public class Triangle extends GameObject {
     private FloatBuffer vertexBuffer;
     private final int openGLESProgram;
+    // number of coordinates per vertex in this array
+    static final int COORDS_PER_VERTEX = 3;
+
+    private int positionHandle;
+    private int colorHandle;
+
+    private final int vertexCount = triangleCoords.length / COORDS_PER_VERTEX;
+    // 4 bytes per vertex
+    private final int vertexStride = COORDS_PER_VERTEX * 4;
 
     private final String vertexShaderCode =
             "attribute vec4 vPosition;" +
@@ -28,8 +37,6 @@ public class Triangle {
                     "  gl_FragColor = vColor;" +
                     "}";
 
-    // number of coordinates per vertex in this array
-    static final int COORDS_PER_VERTEX = 3;
     static float triangleCoords[] = {   // in counterclockwise order:
             0.0f,  0.622008459f, 0.0f, // top
             -0.5f, -0.311004243f, 0.0f, // bottom left
@@ -70,5 +77,33 @@ public class Triangle {
 
         // creates OpenGL ES program executables
         GLES20.glLinkProgram(openGLESProgram);
+    }
+
+    public void draw() {
+        // Add program to OpenGL ES environment
+        GLES20.glUseProgram(this.openGLESProgram);
+
+        // get handle to vertex shader's vPosition member
+        positionHandle = GLES20.glGetAttribLocation(this.openGLESProgram, "vPosition");
+
+        // Enable a handle to the triangle vertices
+        GLES20.glEnableVertexAttribArray(positionHandle);
+
+        // Prepare the triangle coordinate data
+        GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX,
+                GLES20.GL_FLOAT, false,
+                vertexStride, vertexBuffer);
+
+        // get handle to fragment shader's vColor member
+        colorHandle = GLES20.glGetUniformLocation(this.openGLESProgram, "vColor");
+
+        // Set color for drawing the triangle
+        GLES20.glUniform4fv(colorHandle, 1, color, 0);
+
+        // Draw the triangle
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
+
+        // Disable vertex array
+        GLES20.glDisableVertexAttribArray(positionHandle);
     }
 }
